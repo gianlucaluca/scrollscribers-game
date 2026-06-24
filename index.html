@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scrollscribers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a1a;
+      --ink-muted: #555;
+      --ink-faint: #999;
+      --surface: #fff;
+      --surface-alt: #f7f6f2;
+      --rule: #e2e0d8;
+      --accent: #2a4fff;
+      --accent-light: #e8ecff;
+      --tag-bg: #f0eefb;
+      --tag-fg: #3730a3;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+      --max: 860px;
+      --col-gap: 2.5rem;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--surface);
+      color: var(--ink);
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 1.5rem;
+    }
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      gap: 1rem;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--ink);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-links {
+      display: flex;
+      gap: 0;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--ink-muted);
+      text-decoration: none;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover { background: var(--surface-alt); color: var(--ink); }
+
+    /* ── SECTIONS ── */
+    section { border-bottom: 1px solid var(--rule); }
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      background: var(--surface-alt);
+      border-bottom: 1px solid var(--rule);
+    }
+    #hero .container {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--col-gap);
+      align-items: center;
+    }
+    .hero-text .eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .hero-text h1 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+    }
+    .hero-text .tagline {
+      font-size: 1.05rem;
+      color: var(--ink-muted);
+      max-width: 38ch;
+    }
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    .hero-meta-item {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .hero-meta-label {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      min-width: 80px;
+      padding-top: 2px;
+    }
+    .hero-meta-value {
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    .hero-visual {
+      aspect-ratio: 4/3;
+      background: var(--rule);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1.5px dashed #c9c7be;
+    }
+    .placeholder-icon {
+      width: 40px;
+      height: 40px;
+      opacity: 0.35;
+    }
+    .placeholder-label {
+      font-size: 13px;
+      color: var(--ink-faint);
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .section-num {
+      font-family: var(--serif);
+      font-size: 2rem;
+      color: var(--rule);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    /* ── CARDS GRID ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--surface-alt);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .card-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+    }
+    .card-placeholder {
+      background: var(--rule);
+      border-radius: 6px;
+      padding: 1.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #c9c7be;
+    }
+    .card-placeholder span {
+      font-size: 13px;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+    .card-placeholder.tall { min-height: 120px; }
+    .card-placeholder.short { min-height: 60px; }
+
+    /* ── TWO-COL LAYOUT ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--col-gap);
+    }
+    .two-col-wide {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--col-gap);
+    }
+
+    /* ── TAGS ── */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .tag {
+      background: var(--tag-bg);
+      color: var(--tag-fg);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .tag.placeholder {
+      background: var(--rule);
+      color: var(--ink-faint);
+    }
+
+    /* ── PROSE PLACEHOLDER ── */
+    .prose-placeholder {
+      background: var(--surface-alt);
+      border: 1px dashed #c9c7be;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .prose-placeholder p {
+      font-size: 13px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+    .prose-placeholder.sm { min-height: 60px; }
+    .prose-placeholder.md { min-height: 100px; }
+    .prose-placeholder.lg { min-height: 160px; }
+
+    /* ── SUBSECTION ── */
+    .subsection { margin-bottom: 2.5rem; }
+    .subsection:last-child { margin-bottom: 0; }
+    .subsection-title {
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .subsection-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ── MECHANIC LIST ── */
+    .mechanic-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .mechanic-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+    .mechanic-num {
+      width: 28px;
+      height: 28px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .mechanic-content {
+      padding: 0.75rem 1rem;
+      background: var(--surface-alt);
+      border: 1px dashed #c9c7be;
+      border-radius: 8px;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+    }
+    .mechanic-content span {
+      font-size: 13px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    /* ── THEORY CARDS ── */
+    .theory-card {
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .theory-card-head {
+      background: var(--accent-light);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .theory-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .theory-tag {
+      font-size: 11px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+    .theory-card-body { padding: 1.25rem; }
+    .theory-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .theory-field-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+    }
+
+    /* ── PROTOTYPE CHECKLIST ── */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .check-item {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 0.75rem;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--surface-alt);
+    }
+    .check-box {
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid var(--rule);
+      border-radius: 4px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .check-content-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+    .check-content-sub {
+      font-size: 12px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--surface-alt);
+      border-top: 1px solid var(--rule);
+      padding: 2.5rem 1.5rem;
+    }
+    .footer-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-left {
+      font-family: var(--serif);
+      font-size: 1rem;
+      color: var(--ink-muted);
+    }
+    .footer-right {
+      font-size: 13px;
+      color: var(--ink-faint);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      #hero .container { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .two-col { grid-template-columns: 1fr; }
+      .two-col-wide { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-logo" href="#hero">Scrollscribers</a>
+      <ul class="nav-links">
+        <li><a href="#goals">Learning Goals</a></li>
+        <li><a href="#concept">Game Concept</a></li>
+        <li><a href="#theory">Learning Theory</a></li>
+
+
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-text">
+        <p class="eyebrow">Educational Game Project</p>
+        <h1>Scrollscribers</h1>
+        <p class="tagline">Turn based sentence building RPG game to learn Spanish!</p>
+
+      </div>
+      <div class="hero-visual">
+        <svg class="placeholder-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="32" height="32" rx="4" stroke="#999" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <path d="M14 26 L20 16 L26 26" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="26" cy="17" r="2.5" stroke="#999" stroke-width="1.5"/>
+        </svg>
+        <p class="placeholder-label">Game screenshot or key visual<br/>Replace with an image tag</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 1: LEARNING GOALS ── -->
+  <section id="goals">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 class="section-title">Learning Goals &amp; Intended Audience</h2>
+      </div>
+
+      <div class="two-col-wide" style="margin-bottom: 2.5rem;">
+        <div>
+          <div class="subsection">
+            <p class="subsection-title">Learning goals</p>
+            <div class="prose-placeholder md">
+              <p>Improves recognition of sentence structure and how are words are combined to form detailed sentences.</p>
+              <p>Reinforces vocabulary and synonyms to improve general familiarity with the language.</p>
+              <p>Strengthens the player's spelling and recognition skills.</p>
+            </div>
+          </div>
+          <div class="subsection">
+            <p class="subsection-title">Importance of Goals</p>
+            <div class="prose-placeholder md">
+              <p>Without a direct line of communication to a native speaker, learning new languages can be very difficult. However, playing video games in other languages is a generally good replacement as it provides immersion, context, and slang that are accurate to real conversation. However, the player needs to be eased in rather than being thrown into a world full of a foreign language, which is what Scrollscribers aims to do.</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="subsection">
+            <p class="subsection-title">Target audience</p>
+            <div class="cards" style="grid-template-columns: 1fr;">
+              <div class="card">
+                <div class="card-label">Age group</div>
+                <div class="card-placeholder short"><span>Ages 12–16</span></div>
+              </div>
+              <div class="card">
+                <div class="card-label">Educational background</div>
+                <div class="card-placeholder short"><span>Middle/High School students in introductory or intermediate Spanish</span></div>
+              </div>
+              <div class="card">
+                <div class="card-label">Specific learning needs</div>
+                <div class="card-placeholder short"><span>For players who struggle to learn languages in a disconnected context and require a living world to directly apply and learn the concepts from.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <p class="subsection-title">Audience Tailoring</p>
+        <div class="cards">
+          <div class="card">
+            <div class="card-label">Difficulty</div>
+            <div class="card-placeholder tall"><span>Turn based gameplay allows infinite time for reflection, with healing spells, NPC guides, and the Grimoire all as a reference in case players are stuck.</span></div>
+          </div>
+          <div class="card">
+            <div class="card-label">Content</div>
+            <div class="card-placeholder tall"><span>Memorization isn't the focus, but recognition is. The words that fit each part of speech are given, but players have to build logical sentences in order to create powerful spells.</span></div>
+          </div>
+          <div class="card">
+            <div class="card-label">Engagement strategies</div>
+            <div class="card-placeholder tall"><span>RPG progression systems via leveling and an exploration aesthetic keep players engaged and wanting to keep playing.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: GAME CONCEPT & MECHANICS ── -->
+  <section id="concept">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">Game Concept &amp; Mechanics</h2>
+      </div>
+
+      <div class="two-col" style="margin-bottom: 2.5rem;">
+        <div>
+          <div class="subsection">
+            <p class="subsection-title">Narrative / theme</p>
+            <div class="prose-placeholder lg">
+              <p>In the fantasy world of Catalonia, the world's strongest magic is cut off from the rest of the world. An ancient language prevents even the most intelligent sorcerers from obtaining great powers. However, your home is under a great sickness, and the healing spells of old are all that can save you now. Will you be able to recover the scrolls of old and transcribe the language once and for all?</p>
+            </div>
+          </div>
+          <div class="subsection">
+            <p class="subsection-title">Genre &amp; format</p>
+            <div class="tag-row">
+              <span class="tag placeholder">RPG</span>
+              <span class="tag placeholder">Turn-based combat</span>
+              <span class="tag placeholder">Browser / Mobile / Desktop native game</span>
+              <span class="tag placeholder">Singleplayer</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="subsection-title">Game Visuals</p>
+          <div class="hero-visual" style="aspect-ratio: 1/1;">
+            <svg class="placeholder-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="32" height="32" rx="4" stroke="#999" stroke-width="1.5" stroke-dasharray="3 2"/>
+              <path d="M14 26 L20 16 L26 26" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="26" cy="17" r="2.5" stroke="#999" stroke-width="1.5"/>
+            </svg>
+            <p class="placeholder-label">Concept art or gameplay screenshot</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <p class="subsection-title">Core mechanics</p>
+        <div class="mechanic-list">
+          <div class="mechanic-item">
+            <div class="mechanic-num">1</div>
+            <div class="mechanic-content"><span>Players combine parts of a sentence in turn based battles in order to create spells. Based on the words chosen, spells have different effects, like flaming barrels, healing bolts, or electric thunderclouds.</span></div>
+          </div>
+          <div class="mechanic-item">
+            <div class="mechanic-num">2</div>
+            <div class="mechanic-content"><span>NPCs are throughout the world that require the player to use their language skills in order to gain an upper hand on future opponents. Knowledge can be the success to battle!</span></div>
+          </div>
+          <div class="mechanic-item">
+            <div class="mechanic-num">3</div>
+            <div class="mechanic-content"><span>RPG leveling mechanics are present in order to encourage the player to engage in battle in order to progress.</span></div>
+          </div>
+          <div class="mechanic-item">
+            <div class="mechanic-num">4</div>
+            <div class="mechanic-content"><span>The Grimoire serves as a limited use reference for the game's vocabulary. Players can access it at anytime during battle, but spend Mana Points for each use.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection" style="margin-top:2rem;">
+        <p class="subsection-title">Screenshots</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="hero-visual" style="aspect-ratio: 16/9;">
+            <svg class="placeholder-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="32" height="32" rx="4" stroke="#999" stroke-width="1.5" stroke-dasharray="3 2"/>
+              <path d="M14 26 L20 16 L26 26" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="26" cy="17" r="2.5" stroke="#999" stroke-width="1.5"/>
+            </svg>
+            <p class="placeholder-label">Screenshot 1</p>
+          </div>
+          <div class="hero-visual" style="aspect-ratio: 16/9;">
+            <svg class="placeholder-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="32" height="32" rx="4" stroke="#999" stroke-width="1.5" stroke-dasharray="3 2"/>
+              <path d="M14 26 L20 16 L26 26" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="26" cy="17" r="2.5" stroke="#999" stroke-width="1.5"/>
+            </svg>
+            <p class="placeholder-label">Screenshot 2</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: LEARNING THEORIES ── -->
+  <section id="theory">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2 class="section-title">Learning Theories &amp; Perspectives</h2>
+      </div>
+
+      <div class="cards" style="margin-bottom: 2rem;">
+        <!-- Theory Card 1 -->
+        <div class="theory-card">
+          <div class="theory-card-head">
+            <span class="theory-name">Cognitive Perspectives</span>
+          </div>
+          <div class="theory-card-body">
+            <div class="theory-row" style="margin-bottom: 1rem;">
+              <span class="theory-field-label">Elements</span>
+              <div class="prose-placeholder sm"><p>Learning is Contextual, Knowledge is constructed, Metacognition, Motivation</p></div>
+            </div>
+            <div class="theory-row">
+              <span class="theory-field-label">Cognitive and Constructive Mechanics</span>
+              <div class="prose-placeholder sm"><p>Players are encouraged to experiment with new spell combinations and learn which ones are effective against what kind of enemy, and the order in which they should be used via the spell fatigue system. The spells they use in battle are alluded to by NPCs that provide context in how they are used in sentences.</p></div>
+            </div>
+          </div>
+        </div>
+        <!-- Theory Card 2 -->
+        <div class="theory-card">
+          <div class="theory-card-head">
+            <span class="theory-name">Situated Learning</span>
+          </div>
+          <div class="theory-card-body">
+            <div class="theory-row" style="margin-bottom: 1rem;">
+              <span class="theory-field-label">Elements</span>
+              <div class="prose-placeholder sm"><p>Learning In Context, Legitimate Peripheral Participation</p></div>
+            </div>
+            <div class="theory-row">
+              <span class="theory-field-label">Situated Learning Mechanics</span>
+              <div class="prose-placeholder sm"><p>The world around the player and most of its NPCs are presented in Spanish, providing a context in which the player is surrounded by native speakers, as if they were actually traveling abroad. All spells are also available to the player, however their usefulness is only provided via convening with more knowledgable citizens to learn which enemies and situations they are effective against, and how those words (and their synonyms) are used in context.</p></div>
+            </div>
+          </div>
+        </div>
+        <!-- Theory Card 3 (optional) -->
+        <div class="theory-card">
+          <div class="theory-card-head">
+            <span class="theory-name">Behaviorist Principles</span>
+          </div>
+          <div class="theory-card-body">
+            <div class="theory-row" style="margin-bottom: 1rem;">
+              <span class="theory-field-label">Elements</span>
+              <div class="prose-placeholder sm"><p>Classical Conditioning, Positive / Negative reinforcement, Conditioning, Repetition</p></div>
+            </div>
+            <div class="theory-row">
+              <span class="theory-field-label">Behaviorist Mechanics</span>
+              <div class="prose-placeholder sm"><p>Victory / Defeat screens, damage sounds, and large XP numbers immediately after battle completion condition the player with positive feedback via rewards.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-left">Scrollscribers</span>
+    </div>
+  </footer>
+
+</body>
+</html>
